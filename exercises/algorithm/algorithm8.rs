@@ -1,8 +1,7 @@
 /*
 	queue
-	This question requires you to use queues to implement the functionality of the stac
+	This question requires you to use queues to implement the functionality of the stack
 */
-// I AM NOT DONE
 
 #[derive(Debug)]
 pub struct Queue<T> {
@@ -67,15 +66,27 @@ impl<T> myStack<T> {
         }
     }
     pub fn push(&mut self, elem: T) {
-        //TODO
+        self.q1.enqueue(elem);
     }
     pub fn pop(&mut self) -> Result<T, &str> {
-        //TODO
-		Err("Stack is empty")
+        if self.q1.is_empty() {
+            return Err("Stack is empty");
+        }
+        // 将q1中的元素逐个出队并入队到q2，直到q1中只剩下最后一个元素
+        while self.q1.size() > 1 {
+            if let Ok(value) = self.q1.dequeue() {
+                self.q2.enqueue(value);
+            }
+        }
+        // 最后一个元素就是栈顶元素，直接出队
+        if let Ok(value) = self.q1.dequeue() {
+            std::mem::swap(&mut self.q1, &mut self.q2);
+            return Ok(value);
+        }
+        Err("Stack is empty")
     }
     pub fn is_empty(&self) -> bool {
-		//TODO
-        true
+        self.q1.is_empty()
     }
 }
 

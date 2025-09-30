@@ -2,7 +2,6 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -37,7 +36,19 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        self.items.push(value);
+        self.count += 1;
+        // 从最后一个元素开始上浮, 直到堆顶或者不需要上浮为止
+        let mut idx = self.count;
+        while idx > 1 {
+            let parent_idx = self.parent_idx(idx);
+            if (self.comparator)(&self.items[idx], &self.items[parent_idx]) {
+                self.items.swap(idx, parent_idx);
+                idx = parent_idx;
+            } else {
+                break;
+            }
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -57,8 +68,20 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+        let left = self.left_child_idx(idx);
+        let right = self.right_child_idx(idx);
+
+        // 如果右子节点不存在（超出count范围）
+        if right > self.count {
+            return left;
+        }
+
+        // 比较左右子节点，返回更优先的那个
+        if (self.comparator)(&self.items[left], &self.items[right]) {
+            left
+        } else {
+            right
+        }
     }
 }
 
@@ -84,8 +107,34 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        if self.count == 0 {
+            return None;
+        }
+
+        // 交换堆顶和最后一个元素
+        self.items.swap(1, self.count);
+        // 弹出最后一个元素（原来的堆顶）
+        let result = self.items.pop().unwrap();
+        self.count -= 1;
+
+        // 如果堆已空，直接返回
+        if self.count == 0 {
+            return Some(result);
+        }
+
+        // 下沉操作：将新的堆顶元素下沉到合适位置
+        let mut idx = 1;
+        while self.children_present(idx) {
+            let child_idx = self.smallest_child_idx(idx);
+            if (self.comparator)(&self.items[child_idx], &self.items[idx]) {
+                self.items.swap(idx, child_idx);
+                idx = child_idx;
+            } else {
+                break;
+            }
+        }
+
+        Some(result)
     }
 }
 
